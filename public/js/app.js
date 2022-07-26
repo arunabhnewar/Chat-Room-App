@@ -5,6 +5,8 @@ const socket = io();
 const nameForm = document.getElementById('name_form');
 const msgForm = document.getElementById('msg_form');
 const onlineUserList = document.getElementById('onlineUserList');
+const createButton = document.getElementById('create_btn');
+const roomInputField = document.getElementById('create_room');
 
 const nameField = document.querySelector(".name");
 const roomArea = document.querySelector(".room");
@@ -17,7 +19,7 @@ innerCanvas.hidden = true;
 
 // Global Variables Declearation
 let activeUsers;
-// let publicRooms;
+let publicRooms;
 
 
 
@@ -29,7 +31,7 @@ nameForm.addEventListener('submit',(e) => {
     // Validation
     if (!name) return;
 
-    // socket event
+    // Socket Event
     socket.emit('setName', name, () => {
         nameField.hidden = true;
         roomArea.hidden = false;
@@ -71,10 +73,10 @@ msgForm.addEventListener('submit', (e) => {
     const msg = msgForm[0].value;
     const id = msgForm[1].value;
 
-
     // Send Message Event
     if (msg) {
-        socket.emit("send_aMsg", {msg, id}, () => {
+        socket.emit("send_aMsg", { msg, id }, () => {
+            
             const li = document.createElement('li')
             li.classList.add('listGroup-item');
             li.style.color = "#F5F5F5";
@@ -108,10 +110,30 @@ socket.on("received_aMsg", (data, senderId) => {
 
 
 
-
 // Open The Message Canvas
 function openCanvas(user) {
     innerCanvas.hidden = false;
     displayName.textContent = user.name;
     msgForm[1].value = user.id;
 }
+
+
+
+// Create Room Function
+createButton.addEventListener('click', (e) => {
+    const roomName = roomInputField.value;
+    if (roomName) {
+        
+        // Public Room Event
+        socket.emit("create_room", roomName, () => {
+            console.log("Fucked Up");
+        })
+    }
+})
+
+
+
+// Get Public Rooms
+socket.on("getPublicRooms", (publicRooms) => {
+    console.log(publicRooms);
+})
