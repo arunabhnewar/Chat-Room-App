@@ -89,6 +89,8 @@ io.on('connection', (socket) => {
         const activeUsers = await getOnlineUsers();
         io.emit('getActiveUsers', activeUsers);
 
+        const publicRooms = await getPublicRooms();
+        io.emit("getPublicRooms", publicRooms);
     })
 
 
@@ -96,6 +98,9 @@ io.on('connection', (socket) => {
     socket.on('disconnect', async () => {
         const activeUsers = await getOnlineUsers();
         io.emit('getActiveUsers', activeUsers);
+
+        const publicRooms = await getPublicRooms();
+        io.emit("getPublicRooms", publicRooms)
     })
 
 
@@ -103,9 +108,17 @@ io.on('connection', (socket) => {
     socket.on("send_aMsg", (data, callback) => {
         const msg = data.msg;
         const id = data.id;
-
-        io.to(id).emit("received_aMsg", data, socket.id);
-        callback()
+        const isRoom = data.isRoom === "false" ? false : data.isRoom;
+        data.isRoom = isRoom;
+    
+        
+        if (isRoom) {
+            socket.to(id).emit("received_aMsg", data, socket.id);
+            callback();
+        } else {
+            io.to(id).emit("received_aMsg", data, socket.id);
+            callback();
+        }
     })
 
 
@@ -114,7 +127,28 @@ io.on('connection', (socket) => {
         socket.join(roomName);
         
         const publicRooms = await getPublicRooms();
-        io.emit("getPublicRooms", publicRooms)
+        io.emit("getPublicRooms", publicRooms);
+        callback();
+    })
+
+
+    // Join A Room 
+    socket.on("joinRoom", async (roomName, callback) => {
+        socket.join(roomName);
+
+        const publicRooms = await getPublicRooms();
+        io.emit("getPublicRooms", publicRooms);
+        callback();
+    })
+
+
+    // Leave A Room
+    socket.on("leaveRoom", async (roomName, callback) => {
+        socket.leave(roomName);
+
+        const publicRooms = await getPublicRooms();
+        io.emit("getPublicRooms", publicRooms);
+        callback();
     })
 })
 
