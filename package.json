@@ -4,7 +4,8 @@
   "description": "",
   "main": "room.js",
   "scripts": {
-    "dev": "nodemon room.js"
+    "dev": "nodemon room.js",
+    "start": "node room.js"
   },
   "keywords": [],
   "author": "",
