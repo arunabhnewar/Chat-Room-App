@@ -155,6 +155,6 @@ io.on('connection', (socket) => {
 
 
 // Server listening
-expressHTTPServer.listen(3000, () => {
+expressHTTPServer.listen(process.env.PORT, () => {
     console.log("Server has been running on port 3000");
 })
